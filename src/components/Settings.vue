@@ -50,6 +50,14 @@ const settingTab = ref("basic" as keyof typeof settingsItem);
                 placeholder="示例：考试科目 | 时间"></v-text-field>
             </template>
           </v-radio>
+          <v-radio :value="TitleStyle.ExamMode">
+            <template #label>
+              <span>考试模式</span>
+              <v-btn size="small" variant="text" color="primary" class="ml-2" @click.stop="store.examDialogOpen = true">
+                配置
+              </v-btn>
+            </template>
+          </v-radio>
           <v-radio label="不显示" :value="TitleStyle.Off"></v-radio>
         </v-radio-group>
       </v-window-item>

@@ -14,6 +14,14 @@ export const enum TitleStyle {
   Date = 'date',
   Customized = 'customized',
   Off = 'off',
+  ExamMode = 'exam-mode',
+}
+
+export interface ExamPeriod {
+  id: string;
+  subject: string;
+  startTime: string;
+  endTime: string;
 }
 
 const useStore = defineStore("index", () => {
@@ -26,6 +34,7 @@ const useStore = defineStore("index", () => {
     colorProgress: '#00550080',
     titleStyle: TitleStyle.Date,
     titleCustomized: '',
+    examPeriods: [] as ExamPeriod[],
   });
   const formatString = computed(() => preferences.value.secondStyle === SecondStyle.DigitIn ? 'HH:mm:ss' : 'HH:mm');
   const displayTime = computed(() => {
@@ -43,10 +52,17 @@ const useStore = defineStore("index", () => {
         return now.value.format('YYYY/MM/DD');
       case TitleStyle.Off:
         return '';
+      case TitleStyle.ExamMode:
+        const currentTime = now.value.format('HH:mm');
+        const currentExam = preferences.value.examPeriods.find(exam => {
+          return currentTime >= exam.startTime && currentTime <= exam.endTime;
+        });
+        return currentExam ? `${currentExam.subject} (${currentExam.startTime}-${currentExam.endTime})` : '';
     }
   });
   const settingsOpen = ref(false);
-  return { now, displayTime, preferences, barProgress, title, settingsOpen };
+  const examDialogOpen = ref(false);
+  return { now, displayTime, preferences, barProgress, title, settingsOpen, examDialogOpen };
 });
 
 export default useStore;

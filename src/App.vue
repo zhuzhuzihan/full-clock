@@ -7,6 +7,7 @@ import { VBtn } from 'vuetify/components/VBtn';
 import { mdiCog, mdiFullscreen, mdiFullscreenExit } from '@mdi/js';
 import { useFullscreen } from '@vueuse/core';
 import Settings from './components/Settings.vue';
+import ExamModeDialog from './components/ExamModeDialog.vue';
 
 const store = useStore();
 
@@ -88,6 +89,7 @@ const fullscreenHint = computed(() => isFullscreen.value ? '退出全屏' : '全
         <div :class="barStyle.class" :style="barStyle.style"></div>
       </div>
     </div>
+    <exam-mode-dialog></exam-mode-dialog>
   </div>
 </template>
 
