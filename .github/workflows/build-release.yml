@@ -1,9 +1,17 @@
 name: Build and Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v0.1.4)'
+        required: true
+        type: string
+      draft:
+        description: 'Create as draft release'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -55,9 +63,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: '全屏时钟 ${{ github.ref_name }}'
+          tagName: ${{ inputs.version }}
+          releaseName: '全屏时钟 ${{ inputs.version }}'
           releaseBody: 'See the assets to download and install this version.'
-          releaseDraft: true
+          releaseDraft: ${{ inputs.draft }}
           prerelease: false
           args: ${{ matrix.args }}
