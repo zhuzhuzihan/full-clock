@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { VBtn } from 'vuetify/components/VBtn';
 import { VCard, VCardTitle } from 'vuetify/components/VCard';
 import { VRadio } from 'vuetify/components/VRadio';
@@ -21,6 +21,20 @@ const settingsItem = {
 
 const store = useStore();
 const settingTab = ref("basic" as keyof typeof settingsItem);
+
+// 进度条颜色处理：提取RGB部分用于颜色选择器
+const progressColorRGB = computed({
+  get: () => {
+    const color = store.preferences.colorProgress;
+    // 提取6位十六进制RGB部分
+    return color.substring(0, 7);
+  },
+  set: (value: string) => {
+    // 保留原有的透明度部分
+    const alpha = store.preferences.colorProgress.substring(7);
+    store.preferences.colorProgress = value + alpha;
+  }
+});
 </script>
 
 <template>
@@ -62,9 +76,36 @@ const settingTab = ref("basic" as keyof typeof settingsItem);
         </v-radio-group>
       </v-window-item>
       <v-window-item value="colors">
-        <v-text-field label="背景颜色" v-model="store.preferences.background" hint="主界面背景色"></v-text-field>
-        <v-text-field label="字体颜色" v-model="store.preferences.foreground" hint="主界面标题、时间文字颜色"></v-text-field>
-        <v-text-field label="进度条颜色" v-model="store.preferences.colorProgress" hint="背景进度条颜色"></v-text-field>
+        <div class="color-field">
+          <v-text-field label="背景颜色" v-model="store.preferences.background" hint="主界面背景色" hide-details>
+            <template #append>
+              <label class="color-picker-wrapper">
+                <input type="color" v-model="store.preferences.background" class="color-input-hidden" />
+                <div class="color-preview" :style="{ backgroundColor: store.preferences.background }"></div>
+              </label>
+            </template>
+          </v-text-field>
+        </div>
+        <div class="color-field">
+          <v-text-field label="字体颜色" v-model="store.preferences.foreground" hint="主界面标题、时间文字颜色" hide-details>
+            <template #append>
+              <label class="color-picker-wrapper">
+                <input type="color" v-model="store.preferences.foreground" class="color-input-hidden" />
+                <div class="color-preview" :style="{ backgroundColor: store.preferences.foreground }"></div>
+              </label>
+            </template>
+          </v-text-field>
+        </div>
+        <div class="color-field">
+          <v-text-field label="进度条颜色" v-model="store.preferences.colorProgress" hint="支持透明度，如 #00550080">
+            <template #append>
+              <label class="color-picker-wrapper">
+                <input type="color" v-model="progressColorRGB" class="color-input-hidden" />
+                <div class="color-preview" :style="{ backgroundColor: store.preferences.colorProgress }"></div>
+              </label>
+            </template>
+          </v-text-field>
+        </div>
       </v-window-item>
       <v-window-item value="font">
         <v-text-field v-model="store.preferences.fontFamily">
@@ -86,5 +127,29 @@ const settingTab = ref("basic" as keyof typeof settingsItem);
 <style scoped>
 .title-customized {
   width: 12em;
+}
+
+.color-field {
+  padding: 0 1rem;
+}
+
+.color-picker-wrapper {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.color-input-hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.color-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 </style>
